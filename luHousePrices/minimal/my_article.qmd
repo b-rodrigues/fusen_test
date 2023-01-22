@@ -20,7 +20,7 @@ library(testthat)
 ```
 
 ```{r function-define_imports}
-#' This function lists the needed dependencies
+#' define_imports This function lists the needed dependencies
 #'
 #' @importFrom readxl excel_sheets read_excel
 #' @importFrom janitor clean_names
@@ -30,9 +30,7 @@ library(testthat)
 #' @importFrom ggplot2 ggplot geom_line aes
 #' @importFrom rvest read_html html_table
 #' @return Nothing; simply used for NAMESPACE creation
-define_imports <- function(){
-  message("Why you calling me?")
-}
+NULL
 ```
 
 ```{r function-get_raw_data}
@@ -42,10 +40,11 @@ define_imports <- function(){
 #' @return A data frame
 #' @export
 get_raw_data <- function(url = "https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc"){
-  raw_data <- tempfile(fileext = ".xlsx")
+  #raw_data <- tempfile(fileext = ".xlsx")
 
-  download.file(url, raw_data)
+  #download.file(url, raw_data)
 
+  raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
   sheets <- excel_sheets(raw_data)
 
   read_clean <- function(..., sheet){
@@ -74,7 +73,7 @@ get_raw_data <- function(url = "https://data.public.lu/fr/datasets/r/1d20f982-57
 ```
 
 ```{r}
-flat_data <- get_raw_data(url = "https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc")
+raw_data <- get_raw_data(url = "https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc")
 ```
 
 Luxembourg is Luxembourg-ville in 2010 and 2011, then Luxembourg. Pétange is also spelled in two
@@ -90,7 +89,7 @@ as we didn't know these rows where in there:
 #' @return A data frame
 #' @export
 clean_raw_data <- function(raw_data){
-  flat_data %>%
+  raw_data %>%
     mutate(locality = ifelse(grepl("Luxembourg-Ville", locality),
                              "Luxembourg",
                              locality),
@@ -189,13 +188,20 @@ get_test_communes <- function(former_communes, current_communes){
 
 ```
 
-```{r}
-communes <- get_test_communes(former_communes, current_communes)
-```
 
-We now need to check if we have them all in the data:
 
 ```{r tests-clean_flat_data}
+# We now need to check if we have them all in the data. The test needs to be self-contained, hence
+# why we need to redefine the required variables:
+former_communes <- get_former_communes()
+current_communes <- get_current_communes()
+
+communes <- get_test_communes(former_communes, current_communes)
+
+raw_data <- get_raw_data(url = "https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc")
+
+flat_data <- clean_raw_data(raw_data)
+
 testthat::expect_true(
             all(communes %in% unique(flat_data$locality))
                       )
@@ -269,6 +275,11 @@ get_plot <- function(data_to_plot){
 ```
 
 ```{r}
+head(commune_level_data)
+head(country_level_data)
+```
+
+```{r, eval = F}
 commune_level_data %>%
   filter(locality %in% c("Luxembourg",
                          "Esch-sur-Alzette",
@@ -283,5 +294,5 @@ country_level_data %>%
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
 usethis::use_pipe()
-fusen::inflate(flat_file = "minimal/my_article.qmd", vignette_name = "Data cleaning")
+fusen::inflate(flat_file = "minimal/my_article.qmd", vignette_name = "Data cleaning", overwrite = T)
 ```
