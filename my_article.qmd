@@ -21,7 +21,7 @@ download.file("https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78
 
 # for winsucks:
 
-raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
+#raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
 
 sheets <- excel_sheets(raw_data)
 
@@ -45,6 +45,7 @@ flat_data <- raw_data %>%
          ) %>%
   mutate(locality = str_trim(locality)) %>%
   select(year, locality, n_offers, starts_with("average"))
+
 ```
 
 We now need to make sure that we got all the communes/localities in there.
@@ -65,6 +66,7 @@ former_communes <- read_html(url) %>%
   filter(year_dissolved > 2009)
 
 former_communes
+
 ```
 
 We can scrape current communes:
@@ -78,6 +80,7 @@ current_communes <- read_html(url) %>%
   html_table() %>%
   pluck(1) %>%
   clean_names()
+
 ```
 
 Let’s now create a list of all communes:
@@ -107,6 +110,7 @@ flat_data <- flat_data %>%
                            locality)
          ) %>%
   mutate(across(starts_with("average"), as.numeric))
+
 ```
 
 We now need to check if we have them all in the data:
@@ -126,6 +130,7 @@ We don’t need to keep the rows giving the source:
 ```{r}
 flat_data <- flat_data %>%
   filter(!grepl("Source", locality))
+
 ```
 
 Let’s keep the national average in another dataset:
@@ -142,6 +147,7 @@ offers_country <- flat_data %>%
 country_level <- full_join(country_level, offers_country) %>%
   select(year, locality, n_offers, everything()) %>%
   mutate(locality = "Grand-Duchy of Luxembourg")
+
 ```
 
 We can finish cleaning the commune data:
@@ -150,6 +156,7 @@ We can finish cleaning the commune data:
 flat_data <- flat_data %>%
   filter(!grepl("nationale|offres", locality),
          !is.na(locality))
+
 ```
 
 Let’s plot some data for good measure:
@@ -174,4 +181,5 @@ country_level %>%
                 x = year,
                 group = locality,
                 colour = locality))
+
 ```
