@@ -1,0 +1,15 @@
+Package: fusen_test
+Version: 0.0.0.9000
+Title: House Prices In Luxembourg
+Description: This package contains data from the 'Observatoire de l’Habitat' on house prices in Luxembourg, at national and communal level.
+Authors@R: c(person(given = "Bruno",
+         family = "Rodrigues",
+         role = c("aut", "cre"),
+         email = "bruno@brodrigues.co",
+         comment = c(ORCID = "0000-0002-3211-3689")),
+  person(given = "MESR",
+         role = "cph"))
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
