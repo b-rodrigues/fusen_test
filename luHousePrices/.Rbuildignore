@@ -1,3 +1,5 @@
 
 ^dev$
 ^\.here$
+^minimal$
+^LICENSE\.md$
