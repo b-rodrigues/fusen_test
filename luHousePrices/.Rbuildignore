@@ -3,3 +3,5 @@
 ^\.here$
 ^minimal$
 ^LICENSE\.md$
+^README\.Rmd$
+^CODE_OF_CONDUCT\.md$

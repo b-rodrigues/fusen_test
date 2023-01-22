@@ -1,15 +1,28 @@
 Package: luHousePrices
-Version: 0.0.0.9000
 Title: House Prices In Luxembourg
+Version: 0.0.0.9000
+Authors@R: c(
+    person("Bruno", "Rodrigues", , "bruno@brodrigues.co", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-3211-3689")),
+    person("MESR", role = "cph")
+  )
 Description: Contains house prices from the 'L’Observatoire de l’Habitat'.
-Authors@R: c(person(given = "Bruno",
-         family = "Rodrigues",
-         role = c("aut", "cre"),
-         email = "bruno@brodrigues.co",
-         comment = c(ORCID = "0000-0002-3211-3689")),
-  person(given = "MESR",
-         role = "cph"))
 License: GPL (>= 3)
+Imports: 
+    dplyr,
+    ggplot2,
+    janitor,
+    magrittr,
+    purrr,
+    readxl,
+    rvest,
+    stringr
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
