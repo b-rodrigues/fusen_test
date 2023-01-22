@@ -1,0 +1,177 @@
+---
+title: "Nominal house prices data in Luxembourg"
+author: "Bruno Rodrigues"
+date: today
+---
+
+## Downloading the data
+
+This data is downloaded from the "Observatoire de l'habitat":
+
+```{r}
+library(readxl)
+library(purrr)
+library(dplyr)
+library(stringr)
+library(janitor)
+
+raw_data <- tempfile(fileext = ".xlsx")
+download.file("https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc",
+              raw_data)
+
+# for winsucks:
+
+raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
+
+sheets <- excel_sheets(raw_data)
+
+read_clean <- function(..., sheet){
+  read_excel(..., sheet = sheet) %>%
+    mutate(year = sheet)
+}
+
+raw_data <- map_dfr(sheets,
+                    ~read_clean(raw_data,
+                                skip = 10,
+                                sheet = .)) %>%
+            clean_names()
+
+flat_data <- raw_data %>%
+  rename(locality = commune,
+         n_offers = nombre_doffres,
+         average_price_nominal_euros = prix_moyen_annonce_en_courant,
+         average_price_m2_nominal_euros = prix_moyen_annonce_au_m2_en_courant,
+         average_price_m2_nominal_euros = prix_moyen_annonce_au_m2_en_courant
+         ) %>%
+  mutate(locality = str_trim(locality)) %>%
+  select(year, locality, n_offers, starts_with("average"))
+```
+
+We now need to make sure that we got all the communes/localities in there.
+There were mergers in 2011, 2015 and 2018. So we need to account for these
+localities.
+
+We’re now scraping data from wikipedia of former Luxembourguish communes:
+
+```{r}
+library(rvest)
+
+url <- "https://en.wikipedia.org/wiki/Communes_of_Luxembourg#Former_communes"
+
+former_communes <- read_html(url) %>%
+  html_table() %>%
+  pluck(3) %>%
+  clean_names() %>%
+  filter(year_dissolved > 2009)
+
+former_communes
+```
+
+We can scrape current communes:
+
+```{r}
+# let’s now scrape current communes
+
+url <- "https://en.wikipedia.org/wiki/List_of_communes_of_Luxembourg"
+
+current_communes <- read_html(url) %>%
+  html_table() %>%
+  pluck(1) %>%
+  clean_names()
+```
+
+Let’s now create a list of all communes:
+
+```{r}
+communes <- unique(c(former_communes$name, current_communes$commune))
+# we need to rename some communes
+
+# Different spelling of these communes between wikipedia and the data
+
+communes[which(communes == "Clemency")] <- "Clémency"
+communes[which(communes == "Redange")] <- "Redange-sur-Attert"
+communes[which(communes == "Erpeldange-sur-Sûre")] <- "Erpeldange"
+communes[which(communes == "Luxembourg-City")] <- "Luxembourg"
+communes[which(communes == "Käerjeng")] <- "Kaerjeng"
+communes[which(communes == "Petange")] <- "Pétange"
+
+# Luxembourg is Luxembourg-ville in 2010 and 2011, then Luxembourg
+# Pétange is also spelled in two ways
+# also, converts make columns the right type
+flat_data <- flat_data %>%
+  mutate(locality = ifelse(grepl("Luxembourg-Ville", locality),
+                           "Luxembourg",
+                           locality),
+         locality = ifelse(grepl("P.tange", locality),
+                           "Pétange",
+                           locality)
+         ) %>%
+  mutate(across(starts_with("average"), as.numeric))
+```
+
+We now need to check if we have them all in the data:
+
+```{r}
+testthat::expect_true(all(communes %in% flat_data$locality))
+```
+
+We are not missing any commune but we have too many rows still:
+
+```{r}
+setdiff(flat_data$locality, communes)
+```
+
+We don’t need to keep the rows giving the source:
+
+```{r}
+flat_data <- flat_data %>%
+  filter(!grepl("Source", locality))
+```
+
+Let’s keep the national average in another dataset:
+
+```{r}
+country_level <- flat_data %>%
+  filter(grepl("nationale", locality)) %>%
+  select(-n_offers)
+
+offers_country <- flat_data %>%
+  filter(grepl("Total d.offres", locality)) %>%
+  select(year, n_offers)
+
+country_level <- full_join(country_level, offers_country) %>%
+  select(year, locality, n_offers, everything()) %>%
+  mutate(locality = "Grand-Duchy of Luxembourg")
+```
+
+We can finish cleaning the commune data:
+
+```{r}
+flat_data <- flat_data %>%
+  filter(!grepl("nationale|offres", locality),
+         !is.na(locality))
+```
+
+Let’s plot some data for good measure:
+
+```{r}
+library(ggplot2)
+
+flat_data %>%
+  filter(locality %in% c("Luxembourg",
+                         "Esch-sur-Alzette",
+                         "Diekirch")) %>%
+  ggplot() +
+  geom_line(aes(y = average_price_m2_nominal_euros,
+                x = year,
+                group = locality,
+                colour = locality))
+
+
+country_level %>%
+  ggplot() +
+  geom_line(aes(y = average_price_m2_nominal_euros,
+                x = year,
+                group = locality,
+                colour = locality))
+```
