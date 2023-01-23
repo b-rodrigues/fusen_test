@@ -84,8 +84,8 @@ commune_level_data <- make_commune_level_data(flat_data)
 ```
 
 ```{r}
-usethis::use_data(commune_level_data)
-usethis::use_data(country_level_data)
-usethis::use_data(communes)
+usethis::use_data(commune_level_data, overwrite = TRUE)
+usethis::use_data(country_level_data, overwrite = TRUE)
+usethis::use_data(communes, overwrite = TRUE)
 ```
 

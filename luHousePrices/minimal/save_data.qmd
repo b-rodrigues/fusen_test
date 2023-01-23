@@ -4,6 +4,17 @@ author: "Bruno Rodrigues"
 date: today
 ---
 
+```{r development, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(janitor)
+library(purrr)
+library(readxl)
+library(rvest)
+library(stringr)
+library(testthat)
+```
+
 ## Downloading the data
 
 This data is downloaded from the "Observatoire de l'habitat":
@@ -253,13 +264,14 @@ commune_level_data <- make_commune_level_data(flat_data)
 ```
 
 ```{r}
-usethis::use_data(commune_level_data)
-usethis::use_data(country_level_data)
-usethis::use_data(communes)
+usethis::use_data(commune_level_data, overwrite = TRUE)
+usethis::use_data(country_level_data, overwrite = TRUE)
+usethis::use_data(communes, overwrite = TRUE)
 ```
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
+usethis::use_pipe()
 fusen::inflate(flat_file = "minimal/save_data.qmd", vignette_name = "Saving the data", overwrite = T)
 ```
