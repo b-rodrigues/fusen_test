@@ -15,7 +15,6 @@ library(stringr)
 library(testthat)
 ```
 
-## Downloading the data
 
 This data is downloaded from the "Observatoire de l'habitat":
 
@@ -272,6 +271,5 @@ usethis::use_data(communes, overwrite = TRUE)
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-usethis::use_pipe()
 fusen::inflate(flat_file = "minimal/save_data.qmd", vignette_name = "Saving the data", overwrite = T)
 ```
