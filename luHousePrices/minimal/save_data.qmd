@@ -19,20 +19,6 @@ library(testthat)
 This data is downloaded from the "Observatoire de l'habitat":
 
 
-```{r function-define_imports}
-#' define_imports This function lists the needed dependencies
-#'
-#' @importFrom readxl excel_sheets read_excel
-#' @importFrom janitor clean_names
-#' @importFrom dplyr mutate select starts_with across filter rename full_join
-#' @importFrom purrr map_dfr pluck
-#' @importFrom stringr str_trim
-#' @importFrom ggplot2 ggplot geom_line aes
-#' @importFrom rvest read_html html_table
-#' @return Nothing; simply used for NAMESPACE creation
-NULL
-```
-
 ```{r function-get_raw_data}
 #' get_raw_data Gets raw nominal house price data from LU Open Data Portal
 #'
@@ -266,6 +252,50 @@ commune_level_data <- make_commune_level_data(flat_data)
 usethis::use_data(commune_level_data, overwrite = TRUE)
 usethis::use_data(country_level_data, overwrite = TRUE)
 usethis::use_data(communes, overwrite = TRUE)
+```
+
+```{r function-commune_level_data, eval = FALSE}
+#' commune_level_data
+#'
+#' data in luHousePrices'.
+#'
+#' @format A data frame with 1171 rows and 5 variables:
+#' \describe{
+#'   \item{ year }{ 2010 to 2020 }
+#'   \item{ locality }{ Communes of Luxembourg }
+#'   \item{ n_offers }{ Total offers in that commune for that year }
+#'   \item{ average_price_nominal_euros }{ Average selling price of houses in that commune for that year }
+#'   \item{ average_price_m2_nominal_euros }{ Average selling price by m2 of houses in that commune for that year }
+#' }
+#' @source Observatoire de l'Habitat
+"commune_level_data"
+```
+
+```{r function-country_level_data, eval = FALSE}
+#' communes_level_data
+#'
+#' data in 'luHousePrices'.
+#'
+#' @format A data frame with 11 rows and 5 variables:
+#' \describe{
+#'   \item{ year }{ 2010 to 2020 }
+#'   \item{ locality }{ For this dataset, only the country of Luxembourg }
+#'   \item{ n_offers }{ Total offers in the country for that year }
+#'   \item{ average_price_nominal_euros }{ Average selling price of houses in the commune for that year }
+#'   \item{ average_price_m2_nominal_euros }{ Average selling price by m2 of houses in the commune for that year }
+#' }
+#' @source Observatoire de l'Habitat
+"country_level_data"
+```
+
+```{r function-communes, eval = FALSE}
+#' communes
+#'
+#' data in 'luHousePrices'.
+#'
+#' @format A list of luxembourguish communes
+#' @source Observatoire de l'Habitat
+"communes"
 ```
 
 ```{r development-inflate, eval=FALSE}
