@@ -6,11 +6,11 @@
 #' @return A data frame
 #' @export
 get_raw_data <- function(url = "https://data.public.lu/fr/datasets/r/1d20f982-57e1-4ae2-a278-dc78c88c21dc"){
-  #raw_data <- tempfile(fileext = ".xlsx")
+  raw_data <- tempfile(fileext = ".xlsx")
 
-  #download.file(url, raw_data)
+  download.file(url, raw_data)
 
-  raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
+  #raw_data <- "c:/Users/LLP685/Downloads/vente-appartement-2010-2021.xlsx"
   sheets <- excel_sheets(raw_data)
 
   read_clean <- function(..., sheet){

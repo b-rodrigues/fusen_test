@@ -34,15 +34,15 @@ get_plot <- function(data_to_plot){
 ```
 
 ```{r}
-head(commune_level_data)
-head(country_level_data)
+data(commune_level_data, package = "luHousePrices")
+data(country_level_data, package = "luHousePrices")
 ```
 
-```{r, eval = F}
+```{r}
 commune_level_data %>%
-  filter(locality %in% c("Luxembourg",
-                         "Esch-sur-Alzette",
-                         "Diekirch")) %>%
+  dplyr::filter(locality %in% c("Luxembourg",
+                                "Esch-sur-Alzette",
+                                "Diekirch")) %>%
   get_plot()
 
 country_level_data %>%
@@ -52,6 +52,5 @@ country_level_data %>%
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-usethis::use_pipe()
 fusen::inflate(flat_file = "minimal/my_article.qmd", vignette_name = "Data cleaning", overwrite = T)
 ```
